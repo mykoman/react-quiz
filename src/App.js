@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+//import logo from './logo.svg';
 import './App.css';
+import Profile from './github/Profile.jsx';
+import Search from './github/Search'
+
 // import PropTypes from 'prop-types';
+//this line of code was added to allow jquery run smoothly
+const $ = window.$;
 
 class App extends Component {
   constructor(props)
@@ -23,37 +28,61 @@ class App extends Component {
       cache: false,
       success:function(data)
       {
+        this.setState({userData: data});
         console.log(data); 
       }.bind(this),
       error: function(xhr, status, err)
       {
+        this.setState({username: null});
         alert(err);
       }.bind(this)
 
     })
   }
   
+
+  getUserRepos()
+  {
+    $.ajax({
+      url: 'https://api.github.com/users/'+this.state.username+ '/repos?client_id='+this.props.clientId+'&per_page='+this.props.perPage+'&client_secret='+this.props.clientSecret,
+      dataType: 'json',
+      cache: false,
+      success:function(data)
+      {
+        this.setState({userRepos: data});
+        console.log(data); 
+      }.bind(this),
+      error: function(xhr, status, err)
+      {
+        this.setState({username: null});
+        alert(err);
+      }.bind(this)
+
+    })
+  }
+  
+  handleFormSubmit(username){
+    this.setState({username: username}, function()
+    {
+      this.getUserData();
+    this.getUserRepos();
+    }
+      )
+  }
+
   componentDidMount(){
     this.getUserData();
+    this.getUserRepos();
   }
+
+  
   
   render() {
     return (
       <div className="App">
-        {<header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {this.props.clientId}
-          </a>
-        </header>}
+            <Search  onFormSubmit ={this.handleFormSubmit.bind(this)} />
+            <Profile {...this.state} />
+         
       </div>
     );
   }
