@@ -1,87 +1,162 @@
 import React, { Component } from 'react';
 //import logo from './logo.svg';
-import './App.css';
-import Profile from './github/Profile.jsx';
-import Search from './github/Search'
 
-// import PropTypes from 'prop-types';
-//this line of code was added to allow jquery run smoothly
-const $ = window.$;
+import Questionlist from './quiz/Questionlist'
+import './App.css';
+import Scorebox from './quiz/Scorebox';
+import Result from './quiz/Result';
+
 
 class App extends Component {
   constructor(props)
   {
     super(props);
     this.state = {
-      username : 'mykoman',
-      userData : [],
-      userRepos : [],
-      perPage : 5
+
+      questions: [
+        {
+          id: 1, 
+          text: 'what is your name',
+          choices: [
+            {
+              id: 'a',
+              text: 'Michael'
+            },
+            {
+              id: 'b',
+              text: 'Cole'
+            },
+            {
+              id: 'c',
+              text: 'Sandy'
+            },
+          ],
+          correct: 'a'
+        },
+
+        {
+          id: 2,
+          text: 'who is your Dad?',
+          choices: [
+            {
+              id: 'a',
+              text: 'Michael'
+            },
+            {
+              id: 'b',
+              text: 'Cole'
+            },
+            {
+              id: 'c',
+              text: 'Sandy'
+            },
+          ],
+          correct: 'b'
+        },
+
+
+        {
+          id: 3,
+          text: 'Where were you born?',
+          choices: [
+            {
+              id: 'a',
+              text: 'Texas'
+            },
+            {
+              id: 'b',
+              text: 'Colombia'
+            },
+            {
+              id: 'c',
+              text: 'Heaven'
+            },
+          ],
+          correct: 'a'
+        },
+
+        {
+          id: 4,
+          text: 'What is your fav food?',
+          choices: [
+            {
+              id: 'a',
+              text: 'Amala'
+            },
+            {
+              id: 'b',
+              text: 'Poundy'
+            },
+            {
+              id: 'c',
+              text: 'Rice'
+            },
+          ],
+          correct: 'c'
+        },
+
+        {
+          id: 5,
+          text: 'Best subject',
+          choices: [
+            {
+              id: 'a',
+              text: 'Math'
+            },
+            {
+              id: 'b',
+              text: 'English'
+            },
+            {
+              id: 'c',
+              text: 'French'
+            },
+          ],
+          correct: 'b'
+        },
+      ],
+      score : 0,
+      current: 1
+      
     }
-  }
+  } 
 
-  getUserData()
-  {
-    $.ajax({
-      url: 'https://api.github.com/users/'+this.state.username+ '?client_id='+this.props.clientId+'&client_secret='+this.props.clientSecret,
-      dataType: 'json',
-      cache: false,
-      success:function(data)
-      {
-        this.setState({userData: data});
-        console.log(data); 
-      }.bind(this),
-      error: function(xhr, status, err)
-      {
-        this.setState({username: null});
-        alert(err);
-      }.bind(this)
-
-    })
-  }
   
-
-  getUserRepos()
-  {
-    $.ajax({
-      url: 'https://api.github.com/users/'+this.state.username+ '/repos?client_id='+this.props.clientId+'&per_page='+this.props.perPage+'&client_secret='+this.props.clientSecret,
-      dataType: 'json',
-      cache: false,
-      success:function(data)
-      {
-        this.setState({userRepos: data});
-        console.log(data); 
-      }.bind(this),
-      error: function(xhr, status, err)
-      {
-        this.setState({username: null});
-        alert(err);
-      }.bind(this)
-
-    })
-  }
-  
-  handleFormSubmit(username){
-    this.setState({username: username}, function()
-    {
-      this.getUserData();
-    this.getUserRepos();
-    }
-      )
-  }
-
   componentDidMount(){
-    this.getUserData();
-    this.getUserRepos();
+    // this.getUserData();
+    // this.getUserRepos();
+  }
+
+  setCurrent(current){
+    this.setState({current: current});
+  }
+
+  setScore(score){
+    this.setState({score})
   }
 
   
   
   render() {
+    let scorebox = "";
+    let resultboard = "";
+  if(this.state.current < this.state.questions.length +1){
+    scorebox = <Scorebox {...this.state} />;
+    let resultboard ="";
+    
+  }
+  else{
+    scorebox = "";
+    let resultboard = <Result {...this.state}/>
+  }
     return (
       <div className="App">
-            <Search  onFormSubmit ={this.handleFormSubmit.bind(this)} />
-            <Profile {...this.state} />
+
+      <h2>React JS Quiz App</h2>
+      <Result {...this.state}/>
+        {scorebox}
+           <Questionlist  {...this.state } setCurrent={this.setCurrent.bind(this)} setScore={this.setScore.bind(this)} />
+
          
       </div>
     );
